@@ -427,10 +427,6 @@ export class ArcadeEnhancementManager {
           console.log(`🎮 ARCADE: Executing enhancement ${powerUpType} for ${playerId}`);
           this.addEnhancement(playerId, powerUpType, 15000); // 15 second duration
           break;
-        case 'stamina':
-          console.log(`🎮 ARCADE: Executing stamina restoration for ${playerId}`);
-          this.executeStaminaRestore(playerId);
-          break;
         default:
           console.error(`🎮 ARCADE: Unknown power-up type: ${powerUpType}`);
           return false;
