@@ -65,10 +65,40 @@ startServer((world) => {
         let gameActive = false;
         let currentMode = "pickup";
         
-        // Handle player join - simplified version
+        // Handle player join - with UI loading
         world.on(PlayerEvent.JOIN, ({ player }) => {
             try {
                 console.log(`⚽ Player joined: ${player.username}`);
+                
+                // Load the UI first - critical for player interaction
+                player.ui.load('ui/index.html');
+                console.log(`🔧 UI loaded for ${player.username}`);
+                
+                // Set up UI event handler for this player
+                player.ui.onData = (data: any) => {
+                    console.log(`📨 UI message from ${player.username}:`, data.type);
+                    
+                    // Handle team selection
+                    if (data.type === "team-selected") {
+                        console.log(`⚽ ${player.username} selected ${data.team} team`);
+                        world.chatManager.sendPlayerMessage(player, `🎯 You joined the ${data.team} team!`);
+                        
+                        // Could add team assignment logic here
+                        // For now, just acknowledge the selection
+                        return;
+                    }
+                    
+                    // Handle game mode selection
+                    if (data.type === "select-game-mode") {
+                        console.log(`🎮 ${player.username} selected ${data.mode} mode`);
+                        currentMode = data.mode;
+                        world.chatManager.sendBroadcastMessage(`🎮 Game mode changed to ${data.mode}!`, 'blue');
+                        return;
+                    }
+                    
+                    // Handle other UI events
+                    console.log(`📝 Unhandled UI event: ${data.type}`);
+                };
                 
                 // Create player entity with soccer controls
                 const playerEntity = new SoccerPlayerEntity(player);
