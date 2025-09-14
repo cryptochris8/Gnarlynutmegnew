@@ -65,14 +65,28 @@ startServer((world) => {
         let gameActive = false;
         let currentMode = "pickup";
         
-        // Handle player join - with UI loading
-        world.on(PlayerEvent.JOIN, ({ player }) => {
+        // Handle player join - with UI loading (try different event names)
+        console.log("🔧 Setting up player join handler...");
+        
+        // Try the more common event name first
+        world.on(PlayerEvent.JOINED_WORLD, ({ player }) => {
             try {
                 console.log(`⚽ Player joined: ${player.username}`);
                 
-                // Load the UI first - critical for player interaction
-                player.ui.load('ui/index.html');
-                console.log(`🔧 UI loaded for ${player.username}`);
+                // Load the UI first - using simple test UI to avoid React errors
+                try {
+                    player.ui.load('ui/test-simple.html');
+                    console.log(`🔧 Simple test UI loaded for ${player.username}`);
+                } catch (uiError) {
+                    console.error(`❌ Failed to load UI for ${player.username}:`, uiError);
+                    // Fallback: try the original UI
+                    try {
+                        player.ui.load('ui/index.html');
+                        console.log(`🔧 Fallback UI loaded for ${player.username}`);
+                    } catch (fallbackError) {
+                        console.error(`❌ Both UI loads failed for ${player.username}:`, fallbackError);
+                    }
+                }
                 
                 // Set up UI event handler for this player
                 player.ui.onData = (data: any) => {
