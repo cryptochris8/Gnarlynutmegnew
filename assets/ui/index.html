@@ -167,18 +167,18 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
-    display: flex;
+    display: none; /* HYTOPIA FIX: Use display:none to prevent blocking interactions */
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     z-index: 10000;
-    visibility: hidden;
-    opacity: 0;
     transition: all 0.3s ease;
+    pointer-events: none; /* HYTOPIA FIX: Prevent click blocking when hidden */
   }
 
   .loading-overlay.visible {
-    visibility: visible;
+    display: flex; /* HYTOPIA FIX: Show with display flex when visible */
+    pointer-events: auto; /* HYTOPIA FIX: Allow interactions when visible */
     opacity: 1;
   }
 

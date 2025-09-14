@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hytopia UI Test</title>
+</head>
+<body>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #1a1a1a;
+    color: white;
+    padding: 20px;
+  }
+  
+  .button {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    border: 3px solid #4a90e2;
+    padding: 20px 25px;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+  
+  .button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(30, 60, 114, 0.6);
+  }
+</style>
+
+<h1>Hytopia Soccer - Simple UI Test</h1>
+
+<div class="game-mode-selection">
+  <h2>Choose Game Mode</h2>
+  <button id="fifaModeBtn" class="button">🏆 FIFA Mode</button>
+  <button id="arcadeModeBtn" class="button">🎪 Arcade Mode</button>
+</div>
+
+<div class="player-count-selection">
+  <h2>Choose Player Count</h2>
+  <button id="singlePlayerBtn" class="button">👤 Single Player</button>
+  <button id="multiplayerBtn" class="button">👥 Multiplayer</button>
+</div>
+
+<div class="team-selection">
+  <h2>Choose Your Team</h2>
+  <button id="redTeamBtn" class="button">🔴 Red Team</button>
+  <button id="blueTeamBtn" class="button">🔵 Blue Team</button>
+</div>
+
+<script>
+console.log("🔧 Simple UI Test Starting...");
+
+// Global state
+let selectedGameMode = null;
+let selectedPlayerCount = null;
+
+// Hytopia communication helper
+function getHytopiaObject() {
+  return (typeof hytopia !== 'undefined' && hytopia) || 
+         (typeof window.hytopia !== 'undefined' && window.hytopia) ||
+         null;
+}
+
+function sendToHytopia(data) {
+  const hyt = getHytopiaObject();
+  if (hyt && hyt.sendData) {
+    console.log("📤 Sending to Hytopia:", data);
+    hyt.sendData(data);
+    return true;
+  } else {
+    console.warn("⚠️ Hytopia object not available:", data);
+    return false;
+  }
+}
+
+// Game mode selection
+function selectGameMode(mode) {
+  console.log("🎮 Game mode selected:", mode);
+  selectedGameMode = mode;
+  
+  // Update UI
+  document.querySelectorAll('.game-mode-selection .button').forEach(btn => {
+    btn.style.background = 'linear-gradient(135deg, #1e3c72, #2a5298)';
+  });
+  document.getElementById(mode + 'ModeBtn').style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+  
+  // Send to server
+  sendToHytopia({
+    type: "select-game-mode",
+    mode: mode
+  });
+}
+
+// Player count selection
+function selectPlayerCount(count) {
+  console.log("👥 Player count selected:", count);
+  selectedPlayerCount = count;
+  
+  // Update UI
+  document.querySelectorAll('.player-count-selection .button').forEach(btn => {
+    btn.style.background = 'linear-gradient(135deg, #1e3c72, #2a5298)';
+  });
+  document.getElementById(count + 'PlayerBtn').style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+  
+  // Send to server
+  sendToHytopia({
+    type: "select-single-player"
+  });
+}
+
+// Team selection
+function selectTeam(team) {
+  console.log("⚽ Team selected:", team);
+  
+  if (!selectedGameMode) {
+    alert("Please select a game mode first!");
+    return;
+  }
+  
+  if (!selectedPlayerCount) {
+    alert("Please select player count first!");
+    return;
+  }
+  
+  // Update UI
+  document.querySelectorAll('.team-selection .button').forEach(btn => {
+    btn.style.background = 'linear-gradient(135deg, #1e3c72, #2a5298)';
+  });
+  document.getElementById(team + 'TeamBtn').style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+  
+  // Send to server
+  sendToHytopia({
+    type: "team-selected",
+    team: team,
+    singlePlayerMode: selectedPlayerCount === 'single',
+    multiplayerMode: selectedPlayerCount === 'multiplayer',
+    playerCount: selectedPlayerCount,
+    gameMode: selectedGameMode
+  });
+  
+  console.log("✅ All selections complete!");
+}
+
+// Add event listeners
+document.getElementById('fifaModeBtn').onclick = () => selectGameMode('fifa');
+document.getElementById('arcadeModeBtn').onclick = () => selectGameMode('arcade');
+document.getElementById('singlePlayerBtn').onclick = () => selectPlayerCount('single');
+document.getElementById('multiplayerBtn').onclick = () => selectPlayerCount('multiplayer');
+document.getElementById('redTeamBtn').onclick = () => selectTeam('red');
+document.getElementById('blueTeamBtn').onclick = () => selectTeam('blue');
+
+console.log("✅ Simple UI Test Ready!");
+</script>
+
+</body>
+</html>
